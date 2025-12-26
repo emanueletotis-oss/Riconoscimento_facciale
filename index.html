@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Face Target</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+<script defer src="https://unpkg.com/face-api.js"></script>
+<script defer src="js/app.js"></script>
+<script defer src="js/face-recognition.js"></script>
+</head>
+<body>
+<header>
+<button id="startBtn">Start</button>
+<button id="stopBtn">Stop</button>
+<button id="targetBtn">Target</button>
+</header>
+<main>
+<div id="cameraBox">
+<video id="video" autoplay muted></video>
+<canvas id="overlay"></canvas>
+</div>
+</main>
+<input type="file" id="targetUpload" accept="image/*" hidden>
+<div id="popup" class="hidden">
+<p><strong>ATTENZIONE!</strong><br>Il contatto scelto non possiede una foto profilo valida</p>
+</div>
+</body>
+</html>
