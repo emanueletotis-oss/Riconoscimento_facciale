@@ -1,94 +1,109 @@
 const video = document.getElementById('video');
-const btnTarget = document.getElementById('btnTarget');
-const btnStart = document.getElementById('btnStart');
-const btnStop = document.getElementById('btnStop');
-const uploadTarget = document.getElementById('uploadTarget');
-const modalError = document.getElementById('modalError');
-const placeholder = document.getElementById('placeholder');
+const canvas = document.getElementById('overlay');
+const inputTarget = document.getElementById('inputTarget');
+const loadingInfo = document.getElementById('loadingInfo');
+const popupError = document.getElementById('popupError');
+const cameraIcon = document.getElementById('cameraIcon');
 
 let targetDescriptor = null;
-let detectionInterval;
+let faceMatcher = null;
+let stream = null;
+let isScanning = false;
 
-// Carica i modelli di face-api.js
-async function loadModels() {
-    const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-    console.log("Modelli caricati");
+// 1. CARICAMENTO MODELLI
+async function init() {
+    const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        loadingInfo.innerText = "Sistema Pronto. Carica un Target.";
+    } catch (e) {
+        loadingInfo.innerText = "Errore caricamento modelli.";
+    }
 }
 
-loadModels();
+init();
 
-// Gestione caricamento Target
-btnTarget.onclick = () => uploadTarget.click();
+// 2. SCELTA TARGET
+document.getElementById('btnTarget').onclick = () => inputTarget.click();
 
-uploadTarget.onchange = async () => {
-    const file = uploadTarget.files[0];
-    const image = await faceapi.bufferToImage(file);
-    const detection = await faceapi.detectSingleFace(image, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
+inputTarget.onchange = async (e) => {
+    loadingInfo.innerText = "Analisi Target...";
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = await faceapi.bufferToImage(file);
+    const detection = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptor();
 
     if (!detection) {
-        modalError.style.display = 'flex';
+        popupError.style.display = 'flex';
         targetDescriptor = null;
     } else {
         targetDescriptor = detection.descriptor;
-        alert("Target acquisito con successo!");
+        faceMatcher = new faceapi.FaceMatcher(targetDescriptor, 0.6);
+        loadingInfo.innerText = "Target acquisito. Premi Start.";
     }
 };
 
-document.getElementById('closeModal').onclick = () => modalError.style.display = 'none';
+document.getElementById('btnOk').onclick = () => popupError.style.display = 'none';
 
-// Start Scansione
-btnStart.onclick = async () => {
+// 3. START
+document.getElementById('btnStart').onclick = async () => {
     if (!targetDescriptor) {
-        alert("Carica prima un target!");
+        alert("Carica prima un target valido!");
         return;
     }
 
-    placeholder.style.display = 'none';
-    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    cameraIcon.style.display = 'none';
+    video.style.display = 'block';
+    
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
     video.srcObject = stream;
+    isScanning = true;
 
-    video.onplay = () => {
-        const canvas = document.getElementById('overlay');
+    video.addEventListener('play', () => {
         const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
         faceapi.matchDimensions(canvas, displaySize);
 
-        detectionInterval = setInterval(async () => {
+        const loop = async () => {
+            if (!isScanning) return;
+            
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
             const resizedDetections = faceapi.resizeResults(detections, displaySize);
             
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const faceMatcher = new faceapi.FaceMatcher(targetDescriptor, 0.6);
-
             resizedDetections.forEach(detection => {
-                const bestMatch = faceMatcher.findBestMatch(detection.descriptor);
+                const match = faceMatcher.findBestMatch(detection.descriptor);
                 const box = detection.detection.box;
 
-                if (bestMatch.label !== 'unknown') {
-                    // MATCH TROVATO: Doppio riquadro Lawngreen
+                if (match.label !== 'unknown') {
+                    // TARGET TROVATO: Doppio riquadro Lawngreen RGB 124,252,0
                     ctx.strokeStyle = 'rgb(124, 252, 0)';
                     ctx.lineWidth = 4;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(box.x - 5, box.y - 5, box.width + 10, box.height + 10);
-                    
-                    // Ferma la ricerca degli altri (logica istruzioni)
+                    ctx.strokeRect(box.x - 6, box.y - 6, box.width + 12, box.height + 12);
                 } else {
-                    // VOLTO GENERICO: Riquadro Gold
+                    // VOLTO GENERICO: Riquadro Gold RGB 255,215,0
                     ctx.strokeStyle = 'rgb(255, 215, 0)';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 3;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
                 }
             });
-        }, 100);
-    };
+            setTimeout(loop, 100);
+        };
+        loop();
+    });
 };
 
-// Stop
-btnStop.onclick = () => {
-    location.reload(); // Il modo più semplice per resettare tutto allo stato iniziale
+// 4. STOP
+document.getElementById('btnStop').onclick = () => {
+    isScanning = false;
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    location.reload(); // Torna allo stato iniziale come da istruzioni
 };
