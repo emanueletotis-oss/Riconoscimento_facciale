@@ -6,7 +6,6 @@
     <title>Face Finder</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    <!-- Caricamento libreria Face-API -->
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script defer src="script.js"></script>
 </head>
@@ -21,21 +20,27 @@
     </div>
 
     <div class="camera-container" id="cameraContainer">
-        <!-- Icona macchina fotografica silver -->
+        <!-- Icona macchina fotografica con obiettivo centrale -->
         <div id="cameraIcon" class="camera-icon">
-            <svg width="100" height="100" viewBox="0 0 24 24" fill="rgb(192,192,192)">
-                <path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><circle cx="12" cy="13" r="4"/>
+            <svg width="120" height="120" viewBox="0 0 24 24">
+                <path fill="rgb(192,192,192)" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4Z" />
+                <circle cx="12" cy="12" r="5" fill="rgb(220, 220, 220)" stroke="rgb(192,192,192)" stroke-width="1"/>
+                <circle cx="12" cy="12" r="3" fill="rgb(192,192,192)"/>
             </svg>
         </div>
         
         <video id="video" autoplay muted playsinline style="display:none;"></video>
         <canvas id="overlay"></canvas>
         
-        <!-- Stato caricamento modelli -->
-        <div id="loadingInfo">Inizializzazione sistema...</div>
+        <div id="loadingInfo">Sistema Pronto. Carica un Target.</div>
     </div>
 
-    <!-- Popup Errore: Target non valido -->
+    <!-- Pulsante Cambio Fotocamera -->
+    <div class="bottom-bar">
+        <button id="btnSwitch" class="btn-switch">Cambia Fotocamera</button>
+    </div>
+
+    <!-- Popup Errore -->
     <div id="popupError" class="modal">
         <div class="modal-content">
             <p><strong>ATTENZIONE!</strong></p>
@@ -44,7 +49,6 @@
         </div>
     </div>
 
-    <!-- Input file nascosto -->
     <input type="file" id="inputTarget" accept="image/*" style="display:none">
 
 </body>

@@ -9,8 +9,8 @@ let targetDescriptor = null;
 let faceMatcher = null;
 let stream = null;
 let isScanning = false;
+let currentFacingMode = 'environment'; // Default fotocamera posteriore
 
-// 1. CARICAMENTO MODELLI
 async function init() {
     const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
     try {
@@ -22,10 +22,8 @@ async function init() {
         loadingInfo.innerText = "Errore caricamento modelli.";
     }
 }
-
 init();
 
-// 2. SCELTA TARGET
 document.getElementById('btnTarget').onclick = () => inputTarget.click();
 
 inputTarget.onchange = async (e) => {
@@ -42,36 +40,44 @@ inputTarget.onchange = async (e) => {
     } else {
         targetDescriptor = detection.descriptor;
         faceMatcher = new faceapi.FaceMatcher(targetDescriptor, 0.6);
-        loadingInfo.innerText = "Target acquisito. Premi Start.";
+        loadingInfo.innerText = "Target caricato. Premi Start.";
     }
 };
 
 document.getElementById('btnOk').onclick = () => popupError.style.display = 'none';
 
-// 3. START
+async function startCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: currentFacingMode } 
+        });
+        video.srcObject = stream;
+    } catch (err) {
+        alert("Errore fotocamera: " + err);
+    }
+}
+
 document.getElementById('btnStart').onclick = async () => {
     if (!targetDescriptor) {
-        alert("Carica prima un target valido!");
+        alert("Carica prima un target!");
         return;
     }
-
     cameraIcon.style.display = 'none';
     video.style.display = 'block';
-    
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-    video.srcObject = stream;
     isScanning = true;
-
-    video.addEventListener('play', () => {
+    await startCamera();
+    
+    video.onplay = () => {
         const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
         faceapi.matchDimensions(canvas, displaySize);
 
         const loop = async () => {
             if (!isScanning) return;
-            
             const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
             const resizedDetections = faceapi.resizeResults(detections, displaySize);
-            
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -80,14 +86,14 @@ document.getElementById('btnStart').onclick = async () => {
                 const box = detection.detection.box;
 
                 if (match.label !== 'unknown') {
-                    // TARGET TROVATO: Doppio riquadro Lawngreen RGB 124,252,0
+                    // DOPPIO RIQUADRO LAWNGREEN
                     ctx.strokeStyle = 'rgb(124, 252, 0)';
                     ctx.lineWidth = 4;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
                     ctx.lineWidth = 2;
                     ctx.strokeRect(box.x - 6, box.y - 6, box.width + 12, box.height + 12);
                 } else {
-                    // VOLTO GENERICO: Riquadro Gold RGB 255,215,0
+                    // RIQUADRO GOLD
                     ctx.strokeStyle = 'rgb(255, 215, 0)';
                     ctx.lineWidth = 3;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
@@ -96,14 +102,18 @@ document.getElementById('btnStart').onclick = async () => {
             setTimeout(loop, 100);
         };
         loop();
-    });
+    };
 };
 
-// 4. STOP
-document.getElementById('btnStop').onclick = () => {
-    isScanning = false;
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+document.getElementById('btnSwitch').onclick = async () => {
+    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+    if (isScanning) {
+        await startCamera();
+    } else {
+        alert("La fotocamera passerà a " + (currentFacingMode === 'user' ? 'frontale' : 'posteriore') + " all'avvio.");
     }
-    location.reload(); // Torna allo stato iniziale come da istruzioni
+};
+
+document.getElementById('btnStop').onclick = () => {
+    location.reload();
 };

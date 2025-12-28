@@ -1,32 +1,29 @@
 body {
-    background-color: rgb(248, 248, 255); /* ghostwhite */
+    background-color: rgb(248, 248, 255);
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100vh;
 }
 
 .top-bar {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
 }
 
-.right-group {
-    display: flex;
-    gap: 10px;
-}
+.right-group { display: flex; gap: 10px; }
 
 button {
     border: 2px solid black;
     border-radius: 8px;
-    padding: 10px 20px;
+    padding: 10px 18px;
     font-weight: bold;
-    font-size: 16px;
     cursor: pointer;
 }
 
@@ -35,11 +32,11 @@ button {
 .btn-stop { background-color: rgb(220, 20, 60); color: black; }
 
 .camera-container {
-    width: 90vw;
-    height: 70vh;
+    width: 100%;
     max-width: 500px;
-    background-color: rgb(220, 220, 220); /* gainsboro */
-    border: 2px solid black;
+    flex-grow: 1; /* Prende lo spazio disponibile */
+    background-color: rgb(220, 220, 220);
+    border: 3px solid #001f3f;
     position: relative;
     display: flex;
     justify-content: center;
@@ -54,11 +51,26 @@ video, canvas {
     object-fit: cover;
 }
 
+.bottom-bar {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-switch {
+    background-color: #f0f0f0;
+    font-size: 14px;
+}
+
 #loadingInfo {
     position: absolute;
     bottom: 10px;
-    font-size: 12px;
-    color: #555;
+    font-size: 13px;
+    color: #333;
+    background: rgba(255,255,255,0.5);
+    padding: 2px 10px;
+    border-radius: 10px;
 }
 
 /* POPUP */
@@ -79,10 +91,4 @@ video, canvas {
     padding: 30px;
     text-align: center;
     color: rgb(220, 20, 60);
-}
-
-.btn-ok {
-    margin-top: 20px;
-    background: white;
-    padding: 5px 20px;
 }
