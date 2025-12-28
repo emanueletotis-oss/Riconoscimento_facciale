@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Face Finder App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <button id="btnTarget" class="btn-target">Target</button>
+        <div class="right-btns">
+            <button id="btnStart" class="btn-start">Start</button>
+            <button id="btnStop" class="btn-stop">Stop</button>
+        </div>
+    </div>
+
+    <div id="container" class="main-container">
+        <video id="video" autoplay muted playsinline></video>
+        <canvas id="overlay"></canvas>
+        
+        <!-- Placeholder Camera Icon -->
+        <div id="placeholder" class="placeholder">
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="silver">
+                <path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><circle cx="12" cy="13" r="4"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Popup Errore -->
+    <div id="modalError" class="modal">
+        <div class="modal-content">
+            <h3>ATTENZIONE!</h3>
+            <p>Target non valido</p>
+            <button id="closeModal">Ok</button>
+        </div>
+    </div>
+
+    <input type="file" id="uploadTarget" accept="image/*" style="display:none">
+
+</body>
+</html>
