@@ -9,7 +9,7 @@ let targetDescriptor = null;
 let faceMatcher = null;
 let stream = null;
 let isScanning = false;
-let currentFacingMode = 'environment'; // Default fotocamera posteriore
+let currentFacingMode = 'environment';
 
 async function init() {
     const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
@@ -17,9 +17,9 @@ async function init() {
         await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
         await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-        loadingInfo.innerText = "Sistema Pronto. Carica un Target.";
+        loadingInfo.innerText = "SISTEMA PRONTO. CARICA TARGET.";
     } catch (e) {
-        loadingInfo.innerText = "Errore caricamento modelli.";
+        loadingInfo.innerText = "ERRORE CARICAMENTO MODELLI.";
     }
 }
 init();
@@ -27,7 +27,7 @@ init();
 document.getElementById('btnTarget').onclick = () => inputTarget.click();
 
 inputTarget.onchange = async (e) => {
-    loadingInfo.innerText = "Analisi Target...";
+    loadingInfo.innerText = "ANALISI IN CORSO...";
     const file = e.target.files[0];
     if (!file) return;
 
@@ -40,21 +40,21 @@ inputTarget.onchange = async (e) => {
     } else {
         targetDescriptor = detection.descriptor;
         faceMatcher = new faceapi.FaceMatcher(targetDescriptor, 0.6);
-        loadingInfo.innerText = "Target caricato. Premi Start.";
+        loadingInfo.innerText = "TARGET OK. PREMI START.";
     }
 };
 
 document.getElementById('btnOk').onclick = () => popupError.style.display = 'none';
 
 async function startCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
+    if (stream) stream.getTracks().forEach(track => track.stop());
     try {
         stream = await navigator.mediaDevices.getUserMedia({ 
             video: { facingMode: currentFacingMode } 
         });
         video.srcObject = stream;
+        video.style.display = 'block';
+        cameraIcon.style.display = 'none';
     } catch (err) {
         alert("Errore fotocamera: " + err);
     }
@@ -62,11 +62,9 @@ async function startCamera() {
 
 document.getElementById('btnStart').onclick = async () => {
     if (!targetDescriptor) {
-        alert("Carica prima un target!");
+        alert("Devi prima caricare un target!");
         return;
     }
-    cameraIcon.style.display = 'none';
-    video.style.display = 'block';
     isScanning = true;
     await startCamera();
     
@@ -86,20 +84,18 @@ document.getElementById('btnStart').onclick = async () => {
                 const box = detection.detection.box;
 
                 if (match.label !== 'unknown') {
-                    // DOPPIO RIQUADRO LAWNGREEN
                     ctx.strokeStyle = 'rgb(124, 252, 0)';
-                    ctx.lineWidth = 4;
+                    ctx.lineWidth = 5;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
                     ctx.lineWidth = 2;
-                    ctx.strokeRect(box.x - 6, box.y - 6, box.width + 12, box.height + 12);
+                    ctx.strokeRect(box.x - 8, box.y - 8, box.width + 16, box.height + 16);
                 } else {
-                    // RIQUADRO GOLD
                     ctx.strokeStyle = 'rgb(255, 215, 0)';
                     ctx.lineWidth = 3;
                     ctx.strokeRect(box.x, box.y, box.width, box.height);
                 }
             });
-            setTimeout(loop, 100);
+            requestAnimationFrame(loop);
         };
         loop();
     };
@@ -107,11 +103,7 @@ document.getElementById('btnStart').onclick = async () => {
 
 document.getElementById('btnSwitch').onclick = async () => {
     currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
-    if (isScanning) {
-        await startCamera();
-    } else {
-        alert("La fotocamera passerà a " + (currentFacingMode === 'user' ? 'frontale' : 'posteriore') + " all'avvio.");
-    }
+    if (isScanning) await startCamera();
 };
 
 document.getElementById('btnStop').onclick = () => {

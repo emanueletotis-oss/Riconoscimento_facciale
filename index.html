@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Face Finder</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
@@ -11,41 +11,41 @@
 </head>
 <body>
 
-    <div class="top-bar">
-        <button id="btnTarget" class="btn-target">Target</button>
+    <div class="header">
+        <button id="btnTarget" class="btn btn-target">Target</button>
         <div class="right-group">
-            <button id="btnStart" class="btn-start">Start</button>
-            <button id="btnStop" class="btn-stop">Stop</button>
+            <button id="btnStart" class="btn btn-start">Start</button>
+            <button id="btnStop" class="btn btn-stop">Stop</button>
         </div>
     </div>
 
-    <div class="camera-container" id="cameraContainer">
-        <!-- Icona macchina fotografica con obiettivo centrale -->
-        <div id="cameraIcon" class="camera-icon">
-            <svg width="120" height="120" viewBox="0 0 24 24">
-                <path fill="rgb(192,192,192)" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4Z" />
-                <circle cx="12" cy="12" r="5" fill="rgb(220, 220, 220)" stroke="rgb(192,192,192)" stroke-width="1"/>
-                <circle cx="12" cy="12" r="3" fill="rgb(192,192,192)"/>
-            </svg>
+    <div class="main-viewport">
+        <div class="camera-container" id="cameraContainer">
+            <div id="cameraIcon" class="camera-icon">
+                <svg width="100" height="100" viewBox="0 0 24 24">
+                    <path fill="rgb(192,192,192)" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4Z" />
+                    <circle cx="12" cy="12" r="5" fill="rgb(220, 220, 220)" stroke="rgb(192,192,192)" stroke-width="1"/>
+                    <circle cx="12" cy="12" r="3" fill="rgb(192,192,192)"/>
+                </svg>
+            </div>
+            <video id="video" autoplay muted playsinline style="display:none;"></video>
+            <canvas id="overlay"></canvas>
+            <div id="loadingInfo">Sistema Pronto. Carica un Target.</div>
         </div>
-        
-        <video id="video" autoplay muted playsinline style="display:none;"></video>
-        <canvas id="overlay"></canvas>
-        
-        <div id="loadingInfo">Sistema Pronto. Carica un Target.</div>
     </div>
 
-    <!-- Pulsante Cambio Fotocamera -->
-    <div class="bottom-bar">
-        <button id="btnSwitch" class="btn-switch">Cambia Fotocamera</button>
+    <div class="footer">
+        <button id="btnSwitch" class="btn btn-switch">
+            <svg style="vertical-align: middle; margin-right: 5px;" width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19 8l-4 4h3c0 3.31-2.69 6-6 6a5.87 5.87 0 0 1-2.8-.7l-1.46 1.46A7.93 7.93 0 0 0 12 20c4.42 0 8-3.58 8-8h3l-4-4zM5 16l4-4H6c0-3.31 2.69-6 6-6 1.01 0 1.97.25 2.8.7l1.46-1.46A7.93 7.93 0 0 0 12 4c-4.42 0-8 3.58-8 8H1l4 4z"/></svg>
+            Cambia Fotocamera
+        </button>
     </div>
 
-    <!-- Popup Errore -->
     <div id="popupError" class="modal">
         <div class="modal-content">
             <p><strong>ATTENZIONE!</strong></p>
             <p>Target non valido</p>
-            <button id="btnOk" class="btn-ok">Ok</button>
+            <button id="btnOk" class="btn btn-ok">Ok</button>
         </div>
     </div>
 

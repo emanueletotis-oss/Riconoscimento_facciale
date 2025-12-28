@@ -1,49 +1,89 @@
-body {
-    background-color: rgb(248, 248, 255);
-    font-family: Arial, sans-serif;
+/* Reset completo per eliminare scroll e bande */
+* { box-sizing: border-box; }
+
+html, body {
+    height: 100%;
+    width: 100%;
     margin: 0;
-    padding: 15px;
+    padding: 0;
+    overflow: hidden; /* Blocca lo scrolling */
+    background-color: rgb(248, 248, 255);
+}
+
+body {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 100vh;
+    padding: 10px 15px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.top-bar {
-    width: 100%;
-    max-width: 500px;
+/* Header e Footer */
+.header, .footer {
+    flex-shrink: 0; /* Impedisce che i tasti vengano schiacciati */
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px 0;
 }
 
-.right-group { display: flex; gap: 10px; }
+.header { justify-content: space-between; align-items: center; }
+.right-group { display: flex; gap: 8px; }
+.footer { justify-content: center; }
 
-button {
-    border: 2px solid black;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-weight: bold;
-    cursor: pointer;
+/* Contenitore principale flessibile */
+.main-viewport {
+    flex-grow: 1; /* Occupa tutto lo spazio tra header e footer */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 0; /* Importante per flexbox su mobile */
 }
-
-.btn-target { background-color: rgb(218, 165, 32); color: black; }
-.btn-start { background-color: rgb(50, 205, 50); color: black; }
-.btn-stop { background-color: rgb(220, 20, 60); color: black; }
 
 .camera-container {
     width: 100%;
+    height: 100%;
     max-width: 500px;
-    flex-grow: 1; /* Prende lo spazio disponibile */
     background-color: rgb(220, 220, 220);
     border: 3px solid #001f3f;
+    border-radius: 12px;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
 }
 
+/* Pulsanti Accattivanti */
+.btn {
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 0 rgba(0,0,0,1); /* Effetto profondità 3D */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(0,0,0,1);
+}
+
+.btn-target { background-color: rgb(218, 165, 32); color: black; }
+.btn-start { background-color: rgb(50, 205, 50); color: black; }
+.btn-stop { background-color: rgb(220, 20, 60); color: black; }
+.btn-switch { background-color: #ffffff; color: #333; width: 80%; }
+.btn-ok { background: white; margin-top: 20px; width: 100px; }
+
+/* Video e Overlay */
 video, canvas {
     position: absolute;
     width: 100%;
@@ -51,44 +91,36 @@ video, canvas {
     object-fit: cover;
 }
 
-.bottom-bar {
-    margin-top: 15px;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.btn-switch {
-    background-color: #f0f0f0;
-    font-size: 14px;
-}
-
 #loadingInfo {
     position: absolute;
-    bottom: 10px;
-    font-size: 13px;
+    bottom: 12px;
+    font-size: 12px;
+    font-weight: bold;
     color: #333;
-    background: rgba(255,255,255,0.5);
-    padding: 2px 10px;
-    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+    padding: 4px 12px;
+    border-radius: 20px;
+    pointer-events: none;
 }
 
-/* POPUP */
+/* Modal Popup */
 .modal {
     display: none;
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 100;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
 .modal-content {
     background-color: rgb(248, 248, 255);
-    border: 3px solid rgb(220, 20, 60);
-    border-radius: 20px;
-    padding: 30px;
+    border: 4px solid rgb(220, 20, 60);
+    border-radius: 25px;
+    padding: 40px;
     text-align: center;
     color: rgb(220, 20, 60);
+    max-width: 300px;
 }
